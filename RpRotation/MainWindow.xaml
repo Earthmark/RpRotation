@@ -11,51 +11,80 @@
       <RowDefinition/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <Grid Grid.Row="0" Margin="10,5,10,5">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
-      <ListBox ItemsSource="{Binding Entries}" SelectionMode="Single" SelectedIndex="{Binding SelectedEntryIndex}">
-        <ListBox.InputBindings>
-          <KeyBinding
-            Key="Enter"
-            Command="{Binding ChooseEntryCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=SelectedIndex}"/>
-        </ListBox.InputBindings>
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding}">
-              <TextBlock.InputBindings>
-                <MouseBinding
-                  MouseAction="LeftDoubleClick"
-                  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=DataContext.ChooseEntryCommand}"/>
-                <KeyBinding
-                  Key="Enter"
-                  Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=DataContext.ChooseEntryCommand}"/>
-              </TextBlock.InputBindings>
-            </TextBlock>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <StackPanel Grid.Column="1" Orientation="Vertical">
-        <Button Content="Bottom" Command="{Binding ChooseEntryCommand}"/>
-        <Button Content="Up" Margin="0,10,0,0" Command="{Binding MoveEntryUpCommand}"/>
-        <Button Content="Down" Command="{Binding MoveEntryDownCommand}"/>
-        <Button Content="Remove" Margin="0,10,0,0" Command="{Binding DeleteEntryCommand}"/>
-      </StackPanel>
-    </Grid>
-    <Grid Grid.Row="1" Margin="10,5,10,10">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
-      <TextBox Height="Auto" TextWrapping="Wrap" Text="{Binding Entry, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="False" VerticalAlignment="Stretch">
-        <TextBox.InputBindings>
-          <KeyBinding Key="Enter" Command="{Binding AddEntryCommand}"/>
-        </TextBox.InputBindings>
-      </TextBox>
-      <Button Content="+" Width="25" Grid.Column="1" Command="{Binding AddEntryCommand}"/>
-    </Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+    <ListBox
+      Name="ItemList"
+      Grid.Row="0"
+      Grid.Column="0"
+      Margin="3,3,3,3"
+      SelectionMode="Single"
+      SelectedIndex="{Binding SelectedEntryIndex}"
+      ItemsSource="{Binding Entries}">
+      <ListBox.InputBindings>
+        <KeyBinding
+          Key="Enter"
+          Command="{Binding FloorEntryCommand}"
+          CommandParameter="{Binding ElementName=ItemList, Path=SelectedIndex}"/>
+      </ListBox.InputBindings>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding}" Focusable="False">
+            <TextBlock.InputBindings>
+              <MouseBinding
+                MouseAction="LeftDoubleClick"
+                Command="{Binding ElementName=ItemList, Path=DataContext.FloorEntryCommand}"/>
+              <KeyBinding
+                Key="Enter"
+                Command="{Binding ElementName=ItemList, Path=DataContext.FloorEntryCommand}"/>
+            </TextBlock.InputBindings>
+          </TextBlock>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <StackPanel
+      Grid.Row="0"
+      Grid.Column="1"
+      Margin="0,3,3,3"
+      Orientation="Vertical">
+      <Button
+        Margin="0,0,0,5"
+        Content="Bottom"
+        Command="{Binding FloorEntryCommand}"/>
+      <Button
+        Margin="0,0,0,3"
+        Content="Up"
+        Command="{Binding RaiseEntryCommand}"/>
+      <Button
+        Margin="0,0,0,5"
+        Content="Down"
+        Command="{Binding LowerEntryCommand}"/>
+      <Button
+        Content="Remove"
+        Command="{Binding EraseEntryCommand}"/>
+    </StackPanel>
+    <TextBox
+      Name="ItemEntry"
+      Grid.Row="1"
+      Grid.Column="0"
+      Margin="3,0,3,3"
+      Text="{Binding Entry, UpdateSourceTrigger=PropertyChanged}"
+      TextWrapping="NoWrap"
+      AcceptsReturn="False">
+      <TextBox.InputBindings>
+        <KeyBinding
+          Key="Enter"
+          Command="{Binding AddEntryCommand}"/>
+      </TextBox.InputBindings>
+    </TextBox>
+    <Button
+      Grid.Row="1"
+      Grid.Column="1"
+      Margin="0,0,3,3"
+      Content="Add"
+      Command="{Binding AddEntryCommand}"
+      CommandParameter="{Binding ElementName=ItemEntry, Path=Text}"/>
   </Grid>
 </Window>

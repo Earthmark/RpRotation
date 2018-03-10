@@ -33,58 +33,67 @@ namespace RpRotation
         {
           _selectedEntry = value;
           OnPropertyChanged();
-          MoveEntryUpCommand.InvokeCanExecuteChanged();
-          MoveEntryDownCommand.InvokeCanExecuteChanged();
-          ChooseEntryCommand.InvokeCanExecuteChanged();
-          DeleteEntryCommand.InvokeCanExecuteChanged();
+          EraseEntryCommand.InvokeCanExecuteChanged();
+          FloorEntryCommand.InvokeCanExecuteChanged();
+          RaiseEntryCommand.InvokeCanExecuteChanged();
+          LowerEntryCommand.InvokeCanExecuteChanged();
         }
       }
     }
 
-    private bool IndexValid => SelectedEntryIndex != -1;
-
     public ObservableCollection<string> Entries { get; } = new ObservableCollection<string>();
 
     public DelegateCommand AddEntryCommand { get; }
-    public DelegateCommand MoveEntryUpCommand { get; }
-    public DelegateCommand MoveEntryDownCommand { get; }
-    public DelegateCommand ChooseEntryCommand { get; }
-    public DelegateCommand DeleteEntryCommand { get; }
+
+    public DelegateCommand EraseEntryCommand { get; }
+
+    public DelegateCommand FloorEntryCommand { get; }
+
+    public DelegateCommand RaiseEntryCommand { get; }
+
+    public DelegateCommand LowerEntryCommand { get; }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 
     public RpRotationViewModel()
     {
-      AddEntryCommand = new DelegateCommand(() =>
-      {
-        Entries.Insert(0, Entry);
-        Entry = string.Empty;
-      }, () => !string.IsNullOrWhiteSpace(Entry));
-
-      MoveEntryUpCommand = new DelegateCommand(() =>
-      {
-        Entries.Move(SelectedEntryIndex, SelectedEntryIndex - 1);
-      }, () => IndexValid && SelectedEntryIndex > 0);
-
-      MoveEntryDownCommand = new DelegateCommand(() =>
-      {
-        Entries.Move(SelectedEntryIndex, SelectedEntryIndex + 1);
-      }, () => IndexValid && SelectedEntryIndex < Entries.Count - 1);
-
-      DeleteEntryCommand = new DelegateCommand(() =>
-      {
-        var previousIndex = SelectedEntryIndex;
-        Entries.RemoveAt(SelectedEntryIndex);
-        SelectedEntryIndex = previousIndex == Entries.Count ? Entries.Count - 1 : previousIndex;
-      }, () => IndexValid);
-
-      ChooseEntryCommand =new DelegateCommand(() =>
-      {
-        var previousIndex = SelectedEntryIndex;
-        Entries.Move(SelectedEntryIndex, Entries.Count - 1);
-        SelectedEntryIndex = previousIndex;
-      }, () => IndexValid);
+      AddEntryCommand = new DelegateCommand(AddEntry, () => !string.IsNullOrWhiteSpace(Entry));
+      EraseEntryCommand = new DelegateCommand(EraseEntry, () => SelectedEntryIndex != -1);
+      FloorEntryCommand = new DelegateCommand(FloorEntry, () => SelectedEntryIndex != -1);
+      RaiseEntryCommand = new DelegateCommand(RaiseEntry, () => SelectedEntryIndex != -1 && SelectedEntryIndex > 0);
+      LowerEntryCommand = new DelegateCommand(LowerEntry, () => SelectedEntryIndex != -1 && SelectedEntryIndex < Entries.Count - 1);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    private void AddEntry()
+    {
+      Entries.Insert(0, Entry);
+      Entry = string.Empty;
+    }
+
+
+    private void EraseEntry()
+    {
+      var previousIndex = SelectedEntryIndex;
+      Entries.RemoveAt(SelectedEntryIndex);
+      SelectedEntryIndex = previousIndex == Entries.Count ? Entries.Count - 1 : previousIndex;
+    }
+
+    private void FloorEntry()
+    {
+      var previousIndex = SelectedEntryIndex;
+      Entries.Move(SelectedEntryIndex, Entries.Count - 1);
+      SelectedEntryIndex = previousIndex;
+    }
+
+    private void RaiseEntry()
+    {
+      Entries.Move(SelectedEntryIndex, SelectedEntryIndex - 1);
+    }
+
+    private void LowerEntry()
+    {
+      Entries.Move(SelectedEntryIndex, SelectedEntryIndex + 1);
+    }
 
     [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
